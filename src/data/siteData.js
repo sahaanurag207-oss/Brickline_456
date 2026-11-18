@@ -8,6 +8,10 @@ export const photos = {
   ridge: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=85",
   retreat: "https://images.unsplash.com/photo-1600047509358-9dc75507daeb?auto=format&fit=crop&w=2000&q=85",
   quoteHome: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=85",
+  clientGregg: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&h=160&q=80",
+  clientAmelia: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&h=160&q=80",
+  clientDylan: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&h=160&q=80",
+  clientNina: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=160&h=160&q=80",
 };
 
 export const projects = [
@@ -70,6 +74,7 @@ export const testimonials = [
     second: "They went above and beyond to ensure everything went smoothly. Communication was always clear and timely.",
     name: "Gregg Bergstrom",
     title: "Entrepreneur & homeowner",
+    clientImage: photos.clientGregg,
     propertyImage: photos.quoteHome,
   },
   {
@@ -77,6 +82,7 @@ export const testimonials = [
     second: "Every step was well communicated, and the final result exceeded the vision we had in mind.",
     name: "Amelia Hart",
     title: "Creative director",
+    clientImage: photos.clientAmelia,
     propertyImage: photos.maison,
   },
   {
@@ -84,6 +90,7 @@ export const testimonials = [
     second: "Their recommendations were thoughtful and helped us move confidently without any second-guessing.",
     name: "Dylan Ross",
     title: "Property investor",
+    clientImage: photos.clientDylan,
     propertyImage: photos.interior,
   },
   {
@@ -91,6 +98,7 @@ export const testimonials = [
     second: "We never felt rushed, and the attention to detail made all the difference in choosing the right home.",
     name: "Nina Patel",
     title: "Architect",
+    clientImage: photos.clientNina,
     propertyImage: photos.villa,
   },
 ];

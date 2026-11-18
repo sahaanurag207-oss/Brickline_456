@@ -38,6 +38,72 @@ function emailLink(subject) {
   return `mailto:hello@brickline.com?subject=${encodeURIComponent(subject)}`;
 }
 
+function useAutomaticRotation(activeIndex, setActiveIndex, itemCount, setSlideDirection) {
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const [hasFocus, setHasFocus] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => {
+      setPrefersReducedMotion(motionPreference.matches);
+      if (motionPreference.matches) setIsPlaying(false);
+    };
+
+    updateMotionPreference();
+    motionPreference.addEventListener("change", updateMotionPreference);
+    return () => motionPreference.removeEventListener("change", updateMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying || prefersReducedMotion || isHovered || hasFocus) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      setSlideDirection("next");
+      setActiveIndex((current) => (current + 1) % itemCount);
+    }, 5000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [activeIndex, hasFocus, isHovered, isPlaying, itemCount, prefersReducedMotion, setActiveIndex, setSlideDirection]);
+
+  return {
+    isPlaying,
+    setIsPlaying,
+    prefersReducedMotion,
+    isRotating: isPlaying && !prefersReducedMotion && !isHovered && !hasFocus,
+    events: {
+      onMouseEnter: () => setIsHovered(true),
+      onMouseLeave: () => setIsHovered(false),
+      onFocusCapture: () => setHasFocus(true),
+      onBlurCapture: (event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false);
+      },
+    },
+  };
+}
+
+function RotationToggle({ rotation, label }) {
+  return (
+    <button
+      type="button"
+      className="rotation-toggle"
+      aria-label={
+        rotation.prefersReducedMotion
+          ? `Automatic ${label} rotation disabled by reduced-motion preference`
+          : rotation.isPlaying
+            ? `Pause automatic ${label} rotation`
+            : `Resume automatic ${label} rotation`
+      }
+      aria-pressed={!rotation.isPlaying}
+      disabled={rotation.prefersReducedMotion}
+      onClick={() => rotation.setIsPlaying((playing) => !playing)}
+    >
+      {rotation.isPlaying ? <Pause size={13} /> : <Play size={13} />}
+    </button>
+  );
+}
+
 function Hero() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -261,6 +327,7 @@ function Projects() {
 function InProgress() {
   const [showcaseIndex, setShowcaseIndex] = useState(0);
   const [showcaseDirection, setShowcaseDirection] = useState("next");
+  const rotation = useAutomaticRotation(showcaseIndex, setShowcaseIndex, showcaseProjects.length, setShowcaseDirection);
   const visibleProjects = [
     showcaseProjects[showcaseIndex % showcaseProjects.length],
     showcaseProjects[(showcaseIndex + 1) % showcaseProjects.length],
@@ -276,7 +343,7 @@ function InProgress() {
   };
 
   return (
-    <section className="in-progress section-pad" id="about">
+    <section className="in-progress section-pad" id="about" {...rotation.events}>
       <div className="progress-intro">
         <SectionHeading eyebrow="Made for the way you live">
           Executed &amp; in-progress<br />projects<span className="orange-dash"> —</span>
@@ -310,7 +377,8 @@ function InProgress() {
             <button type="button" aria-label="Previous projects" onClick={() => moveShowcase("previous")}><ArrowLeft size={14} /></button>
             <span className="pagination-line"><i style={{ width: `${((showcaseIndex + 1) / showcaseProjects.length) * 100}%` }} /></span>
             <button type="button" aria-label="Next projects" onClick={() => moveShowcase("next")}><ArrowRight size={14} /></button>
-            <span className="sr-only" aria-live="polite">
+            <RotationToggle rotation={rotation} label="project" />
+            <span className="sr-only" aria-live={rotation.isRotating ? "off" : "polite"}>
               Showing {visibleProjects.map((project) => project.name).join(" and ")}
             </span>
           </div>
@@ -346,6 +414,7 @@ function Retreat() {
   const [activeSpotlight, setActiveSpotlight] = useState(0);
   const [previousSpotlight, setPreviousSpotlight] = useState(null);
   const [spotlightDirection, setSpotlightDirection] = useState("next");
+  const rotation = useAutomaticRotation(activeSpotlight, setActiveSpotlight, spotlights.length, setSpotlightDirection);
   const spotlight = spotlights[activeSpotlight];
   const moveSpotlight = (direction) => {
     setPreviousSpotlight(activeSpotlight);
@@ -361,6 +430,7 @@ function Retreat() {
     <section
       className="retreat"
       style={{ backgroundImage: `url("${spotlights[previousSpotlight ?? activeSpotlight].image}")` }}
+      {...rotation.events}
     >
       {previousSpotlight !== null && (
         <div
@@ -382,7 +452,8 @@ function Retreat() {
       </div>
       <div className="retreat-controls">
         <button type="button" aria-label="Previous property spotlight" onClick={() => moveSpotlight("previous")}><ArrowLeft size={14} /></button>
-        <span className="sr-only" aria-live="polite">
+        <RotationToggle rotation={rotation} label="property spotlight" />
+        <span className="sr-only" aria-live={rotation.isRotating ? "off" : "polite"}>
           Property spotlight: {spotlight.location}, {spotlight.title.join(" ")}
         </span>
         <button type="button" aria-label="Next property spotlight" onClick={() => moveSpotlight("next")}><ArrowRight size={14} /></button>
@@ -394,6 +465,7 @@ function Retreat() {
 function Testimonial() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [testimonialDirection, setTestimonialDirection] = useState("next");
+  const rotation = useAutomaticRotation(activeTestimonial, setActiveTestimonial, testimonials.length, setTestimonialDirection);
   const quote = testimonials[activeTestimonial];
 
   const moveTestimonial = (index, direction) => {
@@ -409,12 +481,12 @@ function Testimonial() {
   };
 
   return (
-    <section className="testimonial section-pad" id="testimonials">
+    <section className="testimonial section-pad" id="testimonials" {...rotation.events}>
       <div className="testimonial-heading">
         <div>
           <span className="eyebrow">Illustrative client stories</span>
           <h2>Client testimonials</h2>
-          <p className="testimonial-disclaimer">Sample copy for demonstration; replace with verified client feedback before publication.</p>
+          <p className="testimonial-disclaimer">Illustrative testimonials; replace with verified client feedback before publication.</p>
         </div>
       </div>
 
@@ -432,9 +504,7 @@ function Testimonial() {
 
           <div className="quote-bottom">
             <div className={`client slide-content-${testimonialDirection}`} key={`testimonial-client-${activeTestimonial}`}>
-              <span className="client-initials" aria-hidden="true">
-                {quote.name.split(" ").map((part) => part[0]).join("")}
-              </span>
+              <img className="client-photo" src={quote.clientImage} alt={`Illustrative portrait of ${quote.name}`} loading="lazy" />
               <span><b>{quote.name}</b><small>{quote.title}</small></span>
             </div>
 
@@ -452,7 +522,8 @@ function Testimonial() {
                   />
                 ))}
               </div>
-              <span className="sr-only" aria-live="polite">
+              <RotationToggle rotation={rotation} label="testimonial" />
+              <span className="sr-only" aria-live={rotation.isRotating ? "off" : "polite"}>
                 Testimonial {activeTestimonial + 1} of {testimonials.length}, from {quote.name}
               </span>
               <button type="button" aria-label="Next testimonial" onClick={showNext}><ArrowRight size={13} /></button>

@@ -68,7 +68,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .hero-pagination, .quote-controls { display: flex; align-items: center; gap: 12px; }
 .hero-pagination button, .showcase-controls button, .quote-controls button, .retreat-controls button { display: grid; place-items: center; width: 31px; height: 31px; border: 1px solid #ffffff85; color: white; border-radius: 50%; background: transparent; cursor: pointer; transition: background .2s ease; }
 .hero-pagination button:hover, .retreat-controls button:hover { background: #ec6442; border-color: #ec6442; }
-.hero-pagination .rotation-toggle:disabled { cursor: not-allowed; opacity: .55; }
+.hero-pagination .rotation-toggle:disabled, .showcase-controls .rotation-toggle:disabled, .quote-controls .rotation-toggle:disabled, .retreat-controls .rotation-toggle:disabled { cursor: not-allowed; opacity: .55; }
 .carousel-dots { display: flex; align-items: center; gap: 7px; }
 .hero-pagination .carousel-dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 20px; background: #ffffff80; cursor: pointer; transition: width .2s ease, background-color .2s ease; }
 .hero-pagination .carousel-dot.active { width: 19px; background: #fff; }
@@ -94,12 +94,12 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .slide-background-next { animation: slide-background-from-right .75s cubic-bezier(.22,.61,.36,1) both; }
 .slide-background-previous { animation: slide-background-from-left .75s cubic-bezier(.22,.61,.36,1) both; }
 @keyframes slide-content-from-right {
-  from { opacity: 0; transform: translateX(24px); }
-  to { opacity: 1; transform: translateX(0); }
+  from { transform: translateX(24px); }
+  to { transform: translateX(0); }
 }
 @keyframes slide-content-from-left {
-  from { opacity: 0; transform: translateX(-24px); }
-  to { opacity: 1; transform: translateX(0); }
+  from { transform: translateX(-24px); }
+  to { transform: translateX(0); }
 }
 @keyframes slide-background-from-right {
   from { transform: translateX(100%); }
@@ -199,18 +199,18 @@ h2, h3, p { margin-top: 0; }
 .quote-copy { padding-top: 2px; }
 .quote-text { margin: 0; font-size: 10px; line-height: 1.7; color: #4d4945; }
 .quote-second { margin-top: 10px; }
-.quote-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; }
-.client { display: flex; align-items: center; gap: 8px; }
-.client-initials { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: #fff; background: #6d625a; font-size: 9px; font-weight: 600; }
+.quote-bottom { display: grid; grid-template-columns: minmax(0, 1fr) 138px auto; align-items: center; gap: 10px; margin-top: 16px; }
+.client { display: flex; min-width: 0; align-items: center; gap: 8px; }
+.client-photo { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%; object-fit: cover; background: #eee8e2; }
 .client span { display: flex; flex-direction: column; gap: 3px; }
 .client b { font-size: 9px; font-weight: 600; }
 .client small { color: #8c847d; font-size: 8px; }
-.quote-controls { gap: 8px; }
+.quote-controls { width: 138px; flex: 0 0 138px; gap: 8px; }
 .quote-controls button { width: 22px; height: 22px; }
-.quote-controls .carousel-dots { gap: 5px; }
+.quote-controls .carousel-dots { width: 48px; flex: 0 0 48px; justify-content: center; gap: 5px; }
 .quote-controls .carousel-dot { width: 6px; height: 6px; background: #c6beb7; }
 .quote-controls .carousel-dot.active { width: 15px; background: #ec6442; }
-.quote-count { font-size: 9px; white-space: nowrap; }
+.quote-count { justify-self: end; font-size: 9px; white-space: nowrap; }
 .quote-count span { color: #98908a; }
 .contact-section { display: flex; justify-content: space-between; align-items: end; gap: 30px; background: #f8f6f3; }
 .contact-section h2 { margin: 0 0 12px; font-family: "Manrope", sans-serif; font-size: clamp(30px, 4vw, 52px); line-height: 1.05; font-weight: 550; letter-spacing: -.067em; }
@@ -467,7 +467,8 @@ h2, h3, p { margin-top: 0; }
   .testimonial-content { grid-template-columns: 1fr; gap: 16px; }
   .testimonial-image > img { height: 190px; }
   .quote-text { font-size: 11px; }
-  .quote-bottom { flex-wrap: wrap; }
+  .quote-bottom { display: flex; flex-wrap: wrap; }
+  .quote-controls, .quote-count { margin-left: auto; }
   .contact-section { align-items: flex-start; flex-direction: column; gap: 22px; }
   .contact-actions { flex-direction: row; align-items: center; flex-wrap: wrap; }
   .footer { padding: 36px 22px 18px; }
