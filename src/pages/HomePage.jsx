@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ArrowDown,
   ArrowLeft,
@@ -123,9 +123,23 @@ function Hero() {
         <a className="scroll-cue" href="#highlights"><ArrowDown size={14} /> Scroll to explore</a>
 
         <div className="hero-pagination">
-          <button type="button" aria-label="Previous slide" onClick={showPrevious}><ArrowLeft size={15} /></button>
-          <span className="pagination-line"><i style={{ width: `${((activeSlide + 1) / heroSlides.length) * 100}%` }} /></span>
-          <button type="button" aria-label="Next slide" onClick={showNext}><ArrowRight size={15} /></button>
+          <button type="button" aria-label="Previous featured property" onClick={showPrevious}><ArrowLeft size={15} /></button>
+          <div className="carousel-dots" role="group" aria-label="Choose a featured property">
+            {heroSlides.map((slide, index) => (
+              <button
+                type="button"
+                className={`carousel-dot${activeSlide === index ? " active" : ""}`}
+                aria-label={`Show slide ${index + 1}: ${slide.badge}`}
+                aria-current={activeSlide === index ? "true" : undefined}
+                key={slide.badge}
+                onClick={() => setActiveSlide(index)}
+              />
+            ))}
+          </div>
+          <span className="sr-only" aria-live="polite">
+            Slide {activeSlide + 1} of {heroSlides.length}: {active.badge}
+          </span>
+          <button type="button" aria-label="Next featured property" onClick={showNext}><ArrowRight size={15} /></button>
         </div>
 
         <div className="hero-caption">{active.caption}</div>
@@ -139,9 +153,11 @@ function Hero() {
         href={emailLink("Book a property consultation")}
         aria-label="Book a property consultation"
       >
-        <span className="consultation-top"><Phone size={15} /> Book a consultation</span>
-        <img src={photos.portrait} alt="" />
-        <span className="consultant-label"><b>Talk to an expert</b><small>We're here to help</small></span>
+        <span className="consultation-top">
+          <span className="consultation-icon"><Phone size={15} /></span>
+          <span><b>Book a consultation</b><small>Talk with our team</small></span>
+          <ArrowUpRight size={14} />
+        </span>
       </a>
     </section>
   );
@@ -149,9 +165,9 @@ function Hero() {
 
 function HighlightStrip() {
   const highlights = [
-    { Icon: Home, title: "Move-in-ready\ncomfort", body: "Thoughtfully finished homes make settling in simple, with inviting spaces and practical details ready from day one." },
-    { Icon: LockKeyhole, title: "Peace of mind,\nbuilt in", body: "Secure access and carefully considered building features help make daily life feel comfortable and protected." },
-    { Icon: Globe2, title: "Connected to\nwhat matters", body: "Well-chosen neighborhoods bring everyday essentials, vibrant communities, and new opportunities within easy reach." },
+    { Icon: Home, title: "Explore by property type", body: "The featured collection includes hospitality, commercial, and mixed-use developments, each with a listed location and status.", action: "Browse developments", subject: "Development details and availability" },
+    { Icon: LockKeyhole, title: "Get current details", body: "Availability, pricing, and property specifications can change. Contact the team for up-to-date information.", action: "Request details", subject: "Current property details" },
+    { Icon: Globe2, title: "Plan a next step", body: "Send a consultation request to discuss a property, financing questions, or what to do next.", action: "Book a consultation", subject: "Property consultation" },
   ];
 
   return (
@@ -165,7 +181,7 @@ function HighlightStrip() {
       </div>
 
       <div className="highlight-grid">
-        {highlights.map(({ Icon, title, body }, index) => (
+        {highlights.map(({ Icon, title, body, action, subject }, index) => (
           <article className="highlight-card" key={`${title}-${index}`}>
             <div className="highlight-icon"><Icon size={20} strokeWidth={1.45} /></div>
             <span className="highlight-number">0{index + 1}</span>
@@ -178,7 +194,7 @@ function HighlightStrip() {
               ))}
             </h3>
             <p>{body}</p>
-            <a href={emailLink(`Learn more about ${title.replace("\n", " ")}`)} className="learn-link">Learn more <ArrowUpRight size={12} /></a>
+            <a href={emailLink(subject)} className="learn-link">{action} <ArrowUpRight size={12} /></a>
           </article>
         ))}
       </div>
@@ -190,9 +206,10 @@ function Projects() {
   return (
     <section className="featured section-pad" id="projects">
       <div className="center-heading">
-        <span className="eyebrow">Recent projects</span>
-        <h2><i /> Redefining urban living <i /></h2>
-        <p>A considered collection of places to live, work, and belong.</p>
+        <span className="eyebrow">Selected developments</span>
+        <h2><i /> Live, work, and gather <i /></h2>
+        <p>Browse a mixed portfolio by property type, location, and current status.</p>
+        <p className="content-note">Listings and imagery are sample content. Verify property details and availability before publication.</p>
       </div>
 
       <div className="featured-grid">
@@ -205,7 +222,10 @@ function Projects() {
             </a>
 
             <div className="project-card-copy">
-              <span className="project-status">{project.status}</span>
+              <div className="project-labels">
+                <span className="project-status">{project.status}</span>
+                <span className="project-category">{project.category}</span>
+              </div>
               <h3>{project.name}</h3>
               <span className="project-place">{project.place}</span>
               <a href={emailLink(`Property details: ${project.name}`)} className="button button-orange button-full">
@@ -261,6 +281,9 @@ function InProgress() {
             <button type="button" aria-label="Previous projects" onClick={showPrevious}><ArrowLeft size={14} /></button>
             <span className="pagination-line"><i style={{ width: `${((showcaseIndex + 1) / showcaseProjects.length) * 100}%` }} /></span>
             <button type="button" aria-label="Next projects" onClick={showNext}><ArrowRight size={14} /></button>
+            <span className="sr-only" aria-live="polite">
+              Showing {visibleProjects.map((project) => project.name).join(" and ")}
+            </span>
           </div>
 
           <a className="showcase-explore" href="#projects">Explore more projects <span>in our collection</span> <ArrowUpRight size={13} /></a>
@@ -307,8 +330,11 @@ function Retreat() {
         <a href="#projects" className="button button-white">Find property <ChevronRight size={14} /></a>
       </div>
       <div className="retreat-controls">
-        <button type="button" aria-label="Previous feature" onClick={showPrevious}><ArrowLeft size={14} /></button>
-        <button type="button" aria-label="Next feature" onClick={showNext}><ArrowRight size={14} /></button>
+        <button type="button" aria-label="Previous property spotlight" onClick={showPrevious}><ArrowLeft size={14} /></button>
+        <span className="sr-only" aria-live="polite">
+          Property spotlight: {spotlight.location}, {spotlight.title.join(" ")}
+        </span>
+        <button type="button" aria-label="Next property spotlight" onClick={showNext}><ArrowRight size={14} /></button>
       </div>
     </section>
   );
@@ -322,18 +348,18 @@ function Testimonial() {
   const showNext = () => setActiveTestimonial((current) => (current + 1) % testimonials.length);
 
   return (
-    <section className="testimonial section-pad">
+    <section className="testimonial section-pad" id="testimonials">
       <div className="testimonial-heading">
         <div>
-          <span className="eyebrow">A word from our community</span>
-          <h2>Our client testimonial</h2>
+          <span className="eyebrow">Illustrative client stories</span>
+          <h2>Client testimonials</h2>
+          <p className="testimonial-disclaimer">Sample copy for demonstration; replace with verified client feedback before publication.</p>
         </div>
-        <a className="text-link" href="mailto:hello@brickline.com">Our clients <ArrowUpRight size={15} /></a>
       </div>
 
       <div className="testimonial-content">
         <div className="testimonial-image">
-          <img src={quote.image} alt="Modern Brickline residence" />
+          <img src={quote.propertyImage} alt="Modern residence" />
           <span className="quote-mark"><Quote size={20} fill="currentColor" /></span>
         </div>
 
@@ -343,13 +369,29 @@ function Testimonial() {
 
           <div className="quote-bottom">
             <div className="client">
-              <img src={quote.image} alt="" />
+              <span className="client-initials" aria-hidden="true">
+                {quote.name.split(" ").map((part) => part[0]).join("")}
+              </span>
               <span><b>{quote.name}</b><small>{quote.title}</small></span>
             </div>
 
             <div className="quote-controls">
               <button type="button" aria-label="Previous testimonial" onClick={showPrevious}><ArrowLeft size={13} /></button>
-              <span className="pagination-line"><i style={{ width: `${((activeTestimonial + 1) / testimonials.length) * 100}%` }} /></span>
+              <div className="carousel-dots" role="group" aria-label="Choose a testimonial">
+                {testimonials.map((item, index) => (
+                  <button
+                    type="button"
+                    className={`carousel-dot${activeTestimonial === index ? " active" : ""}`}
+                    aria-label={`Show testimonial ${index + 1} from ${item.name}`}
+                    aria-current={activeTestimonial === index ? "true" : undefined}
+                    key={item.name}
+                    onClick={() => setActiveTestimonial(index)}
+                  />
+                ))}
+              </div>
+              <span className="sr-only" aria-live="polite">
+                Testimonial {activeTestimonial + 1} of {testimonials.length}, from {quote.name}
+              </span>
               <button type="button" aria-label="Next testimonial" onClick={showNext}><ArrowRight size={13} /></button>
             </div>
 
@@ -414,8 +456,7 @@ function Footer() {
       <div className="footer-bottom">
         <span>© 2026 Brickline. All rights reserved.</span>
         <div>
-          <span>Privacy</span>
-          <span>Terms</span>
+          <a href="mailto:hello@brickline.com?subject=Website%20enquiry">Contact</a>
           <span>Made for living well.</span>
         </div>
       </div>
@@ -424,6 +465,11 @@ function Footer() {
 }
 
 function HomePage() {
+  useEffect(() => {
+    const targetId = window.location.hash.slice(1);
+    if (targetId) document.getElementById(targetId)?.scrollIntoView();
+  }, []);
+
   return (
     <main>
       <Hero />
