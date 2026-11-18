@@ -83,7 +83,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .consultation-top { display: flex; align-items: center; gap: 9px; color: white; font-size: 9px; font-weight: 600; }
 .consultation-top > span:nth-child(2) { display: flex; flex: 1; flex-direction: column; gap: 3px; }
 .consultation-top small { color: #ffffffb8; font-size: 8px; font-weight: 400; }
-.consultation-icon { display: grid; flex: 0 0 32px; place-items: center; width: 32px; height: 32px; background: #ec6442; }
+.consultation-photo { display: block; flex: 0 0 42px; width: 42px; height: 48px; object-fit: cover; object-position: center 25%; }
 
 @keyframes hero-copy-reveal {
   from { opacity: 0; transform: translateY(14px); }
@@ -402,32 +402,20 @@ h2, h3, p { margin-top: 0; }
   .hero-index { grid-column: 2; grid-row: 1; }
   .hero-index { position: static; }
   .consultation-card {
-    position: fixed;
-    z-index: 10;
-    right: 18px;
-    bottom: calc(18px + env(safe-area-inset-bottom));
-    display: grid;
-    place-items: center;
-    width: 56px;
-    height: 56px;
-    padding: 0;
+    position: absolute;
+    z-index: 2;
+    right: 12px;
+    bottom: 92px;
+    width: min(210px, calc(100vw - 24px));
+    padding: 6px;
     border: 1px solid #ffffffb8;
-    border-radius: 50%;
-    background: #ec6442;
+    border-radius: 6px;
+    background: #171511ed;
     box-shadow: 0 8px 22px #21191555;
   }
-  .consultation-card .consultation-top {
-    display: grid;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    border-radius: 50%;
-  }
-  .consultation-card .consultation-top > span:nth-child(2),
-  .consultation-card .consultation-top > svg:last-child { display: none; }
-  .consultation-icon { flex: 0 0 32px; width: 32px; height: 32px; background: transparent; }
-  .consultation-icon svg { width: 22px; height: 22px; }
+  .consultation-card .consultation-top { gap: 8px; }
+  .consultation-photo { flex-basis: 42px; }
+  .consultation-card .consultation-top > svg:last-child { flex: 0 0 auto; }
   .section-pad { padding: 42px 22px; }
   .highlights { padding: 37px 20px 20px; }
   .highlights-top { align-items: start; flex-direction: column; gap: 12px; }

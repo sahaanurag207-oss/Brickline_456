@@ -9,7 +9,6 @@ import {
   Home,
   LockKeyhole,
   Pause,
-  Phone,
   Play,
   Quote,
   Sparkles,
@@ -239,7 +238,7 @@ function Hero() {
         aria-label="Book a property consultation"
       >
         <span className="consultation-top">
-          <span className="consultation-icon"><Phone size={15} /></span>
+          <img className="consultation-photo" src="/consultation-advisor.jpg" alt="" aria-hidden="true" />
           <span><b>Book a consultation</b><small>Talk with our team</small></span>
           <ArrowUpRight size={14} />
         </span>
