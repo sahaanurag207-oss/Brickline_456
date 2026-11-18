@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/properties", "destination": "/" },
+    { "source": "/properties/:slug", "destination": "/" },
+    { "source": "/about", "destination": "/" },
+    { "source": "/services", "destination": "/" },
+    { "source": "/requirements", "destination": "/" }
+  ]
+}

@@ -12,6 +12,7 @@ export const photos = {
 
 export const projects = [
   {
+    slug: "botanic-kitchen-restaurant",
     name: "Botanic Kitchen & Restaurant",
     place: "Chapel Hill, North Carolina",
     image: photos.botanic,
@@ -19,6 +20,7 @@ export const projects = [
     category: "Hospitality",
   },
   {
+    slug: "prime-edge-business-park",
     name: "Prime Edge Business Park",
     place: "Austin, Texas",
     image: photos.interior,
@@ -26,6 +28,7 @@ export const projects = [
     category: "Commercial",
   },
   {
+    slug: "renewsphere-district",
     name: "RenewSphere District",
     place: "San Francisco, California",
     image: photos.ridge,
@@ -92,9 +95,21 @@ export const testimonials = [
   },
 ];
 
+export const goldenHorizon = {
+  slug: "golden-horizon-villa",
+  name: "Golden Horizon Villa",
+  place: "South Carolina, 2025",
+  image: photos.golden,
+  category: "Residential",
+  status: "Portfolio sample",
+  description: "Discover the privacy of a thoughtfully designed villa, with refined interiors, peaceful surroundings, and room to unwind.",
+};
+
 export const showcaseProjects = [
-  { name: "Maison Noire", place: "Oklahoma City, 2024", image: photos.maison },
-  { name: "Villa Bellagio", place: "San Francisco, 2024", image: photos.villa },
-  { name: "The Ridge House", place: "Aspen, 2025", image: photos.ridge },
-  { name: "Haven Courtyard", place: "Austin, 2025", image: photos.golden },
+  { slug: "maison-noire", name: "Maison Noire", place: "Oklahoma City, 2024", image: photos.maison, category: "Residential", status: "Portfolio sample" },
+  { slug: "villa-bellagio", name: "Villa Bellagio", place: "San Francisco, 2024", image: photos.villa, category: "Residential", status: "Portfolio sample" },
+  { slug: "the-ridge-house", name: "The Ridge House", place: "Aspen, 2025", image: photos.ridge, category: "Residential", status: "Portfolio sample" },
+  { slug: "haven-courtyard", name: "Haven Courtyard", place: "Austin, 2025", image: photos.golden, category: "Residential", status: "Portfolio sample" },
 ];
+
+export const propertyCatalog = [...projects, goldenHorizon, ...showcaseProjects];

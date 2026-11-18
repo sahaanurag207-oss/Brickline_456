@@ -8,21 +8,15 @@ import {
   Globe2,
   Home,
   LockKeyhole,
-  Menu,
-  MoveUpRight,
+  Pause,
   Phone,
+  Play,
   Quote,
   Sparkles,
 } from "lucide-react";
-import { heroSlides, projects, showcaseProjects, testimonials, photos } from "../data/siteData";
-
-function Brand({ light = false }) {
-  return (
-    <a className={`brand${light ? " brand-light" : ""}`} href="#top" aria-label="Brickline home">
-      BRICKLINE<span>.</span>
-    </a>
-  );
-}
+import { Link } from "react-router-dom";
+import { SiteFooter, SiteHeader } from "../components/SiteChrome";
+import { goldenHorizon, heroSlides, projects, showcaseProjects, testimonials, photos } from "../data/siteData";
 
 function SectionHeading({ eyebrow, children, action }) {
   return (
@@ -32,9 +26,9 @@ function SectionHeading({ eyebrow, children, action }) {
         <h2>{children}</h2>
       </div>
       {action && (
-        <a className="text-link" href="#projects">
+        <Link className="text-link" to="/properties">
           {action} <ArrowUpRight size={15} strokeWidth={1.7} />
-        </a>
+        </Link>
       )}
     </div>
   );
@@ -44,62 +38,68 @@ function emailLink(subject) {
   return `mailto:hello@brickline.com?subject=${encodeURIComponent(subject)}`;
 }
 
-function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  return (
-    <>
-      <header className={`site-header${menuOpen ? " menu-open" : ""}`}>
-        <button
-          type="button"
-          className="mobile-menu"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <Menu size={21} />
-        </button>
-
-        <nav className="nav-left" aria-label="Main navigation">
-          <a href="#projects">Projects</a>
-          <a href="#highlights">Services</a>
-          <a href="#about">About us</a>
-        </nav>
-
-        <Brand light />
-
-        <nav className="nav-right" aria-label="Property navigation">
-          <a href="#projects">Properties</a>
-          <a href={emailLink("Financing and loan consultation")}>Loan</a>
-          <a className="nav-cta" href="#contact">Contact us</a>
-        </nav>
-      </header>
-
-      <nav className={`mobile-nav${menuOpen ? " open" : ""}`} aria-label="Mobile navigation">
-        <a href="#projects" onClick={() => setMenuOpen(false)}>Projects</a>
-        <a href="#highlights" onClick={() => setMenuOpen(false)}>Services</a>
-        <a href="#about" onClick={() => setMenuOpen(false)}>About us</a>
-        <a href={emailLink("Financing and loan consultation")} onClick={() => setMenuOpen(false)}>Loan</a>
-        <a href="#contact" onClick={() => setMenuOpen(false)}>Contact us</a>
-      </nav>
-    </>
-  );
-}
-
 function Hero() {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const [hasFocus, setHasFocus] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const active = heroSlides[activeSlide];
   const slideTitle = active.title.split("\n");
 
   const showPrevious = () => setActiveSlide((current) => (current - 1 + heroSlides.length) % heroSlides.length);
   const showNext = () => setActiveSlide((current) => (current + 1) % heroSlides.length);
 
-  return (
-    <section className="hero" id="top" style={{ backgroundImage: `url("${active.background}")` }}>
-      <div className="hero-shade" />
-      <Header />
+  useEffect(() => {
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => {
+      setPrefersReducedMotion(motionPreference.matches);
+      if (motionPreference.matches) setIsPlaying(false);
+    };
 
-      <div className="hero-copy">
+    updateMotionPreference();
+    motionPreference.addEventListener("change", updateMotionPreference);
+    return () => motionPreference.removeEventListener("change", updateMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying || prefersReducedMotion || isHovered || hasFocus) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % heroSlides.length);
+    }, 5000);
+
+    return () => window.clearInterval(intervalId);
+  }, [hasFocus, isHovered, isPlaying, prefersReducedMotion]);
+
+  return (
+    <section
+      className="hero"
+      id="top"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocusCapture={() => setHasFocus(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false);
+      }}
+    >
+      <div
+        className="hero-background-track"
+        aria-hidden="true"
+        style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+      >
+        {heroSlides.map((slide) => (
+          <div
+            className="hero-background"
+            key={slide.badge}
+            style={{ backgroundImage: `url("${slide.background}")` }}
+          />
+        ))}
+      </div>
+      <div className="hero-shade" />
+      <SiteHeader overlay />
+
+      <div className="hero-copy" key={`copy-${activeSlide}`}>
         <span className="pill pill-light">{active.badge}</span>
         <h1>
           {slideTitle.map((line, index) => (
@@ -110,9 +110,9 @@ function Hero() {
           ))}
         </h1>
         <p>{active.body}</p>
-        <a href="#projects" className="button button-white">
+        <Link to="/properties" className="button button-white">
           Find property <ChevronRight size={15} />
-        </a>
+        </Link>
       </div>
 
       <span className="hero-tag">
@@ -120,7 +120,7 @@ function Hero() {
       </span>
 
       <div className="hero-bottom">
-        <a className="scroll-cue" href="#highlights"><ArrowDown size={14} /> Scroll to explore</a>
+        <Link className="scroll-cue" to="/#highlights"><ArrowDown size={14} /> Scroll to explore</Link>
 
         <div className="hero-pagination">
           <button type="button" aria-label="Previous featured property" onClick={showPrevious}><ArrowLeft size={15} /></button>
@@ -136,10 +136,29 @@ function Hero() {
               />
             ))}
           </div>
-          <span className="sr-only" aria-live="polite">
+          <span
+            className="sr-only"
+            aria-live={isPlaying && !prefersReducedMotion && !isHovered && !hasFocus ? "off" : "polite"}
+          >
             Slide {activeSlide + 1} of {heroSlides.length}: {active.badge}
           </span>
           <button type="button" aria-label="Next featured property" onClick={showNext}><ArrowRight size={15} /></button>
+          <button
+            type="button"
+            className="rotation-toggle"
+            aria-label={
+              prefersReducedMotion
+                ? "Automatic slide rotation disabled by reduced-motion preference"
+                : isPlaying
+                  ? "Pause automatic slide rotation"
+                  : "Resume automatic slide rotation"
+            }
+            aria-pressed={!isPlaying}
+            disabled={prefersReducedMotion}
+            onClick={() => setIsPlaying((playing) => !playing)}
+          >
+            {isPlaying ? <Pause size={13} /> : <Play size={13} />}
+          </button>
         </div>
 
         <div className="hero-caption">{active.caption}</div>
@@ -177,7 +196,7 @@ function HighlightStrip() {
           <span className="eyebrow">The Brickline difference</span>
           <h2>Outstanding highlights</h2>
         </div>
-        <a className="text-link" href="#about">Get started <ArrowUpRight size={15} /></a>
+        <Link className="text-link" to="/requirements">Get started <ArrowUpRight size={15} /></Link>
       </div>
 
       <div className="highlight-grid">
@@ -215,11 +234,11 @@ function Projects() {
       <div className="featured-grid">
         {projects.map((project, index) => (
           <article className={`featured-card featured-card-${index + 1}`} key={project.name}>
-            <a className="project-image" href={emailLink(`Property details: ${project.name}`)}>
+            <Link className="project-image" to={`/properties/${project.slug}`}>
               <img src={project.image} alt={project.name} />
               {index === 1 && <span className="image-chip"><span>●</span> Explore virtually</span>}
               <span className="image-arrow"><ArrowUpRight size={17} /></span>
-            </a>
+            </Link>
 
             <div className="project-card-copy">
               <div className="project-labels">
@@ -228,9 +247,9 @@ function Projects() {
               </div>
               <h3>{project.name}</h3>
               <span className="project-place">{project.place}</span>
-              <a href={emailLink(`Property details: ${project.name}`)} className="button button-orange button-full">
+              <Link to={`/properties/${project.slug}`} className="button button-orange button-full">
                 View details <ArrowUpRight size={14} />
-              </a>
+              </Link>
             </div>
           </article>
         ))}
@@ -241,13 +260,20 @@ function Projects() {
 
 function InProgress() {
   const [showcaseIndex, setShowcaseIndex] = useState(0);
+  const [showcaseDirection, setShowcaseDirection] = useState("next");
   const visibleProjects = [
     showcaseProjects[showcaseIndex % showcaseProjects.length],
     showcaseProjects[(showcaseIndex + 1) % showcaseProjects.length],
   ];
 
-  const showPrevious = () => setShowcaseIndex((current) => (current - 1 + showcaseProjects.length) % showcaseProjects.length);
-  const showNext = () => setShowcaseIndex((current) => (current + 1) % showcaseProjects.length);
+  const moveShowcase = (direction) => {
+    setShowcaseDirection(direction);
+    setShowcaseIndex((current) => (
+      direction === "next"
+        ? (current + 1) % showcaseProjects.length
+        : (current - 1 + showcaseProjects.length) % showcaseProjects.length
+    ));
+  };
 
   return (
     <section className="in-progress section-pad" id="about">
@@ -262,31 +288,34 @@ function InProgress() {
 
       <div className="project-showcase">
         <article className="showcase-primary">
-          <a className="showcase-photo" href={emailLink("Golden Horizon Villa details")}><img src={photos.golden} alt="Contemporary Golden Horizon Villa" /></a>
-          <div className="showcase-meta"><h3>Golden Horizon Villa</h3><span>South Carolina, 2025</span></div>
-          <p>Discover the privacy of a thoughtfully designed villa, with refined interiors, peaceful surroundings, and room to unwind.</p>
-          <a className="text-link" href={emailLink("Golden Horizon Villa details")}>Explore this home <ArrowUpRight size={14} /></a>
+          <Link className="showcase-photo" to={`/properties/${goldenHorizon.slug}`}><img src={goldenHorizon.image} alt={goldenHorizon.name} /></Link>
+          <div className="showcase-meta"><h3>{goldenHorizon.name}</h3><span>{goldenHorizon.place}</span></div>
+          <p>{goldenHorizon.description}</p>
+          <Link className="text-link" to={`/properties/${goldenHorizon.slug}`}>Explore this home <ArrowUpRight size={14} /></Link>
         </article>
 
         <div className="showcase-side">
           {visibleProjects.map((project) => (
-            <article className="showcase-small" key={`${project.name}-${project.place}`}>
-              <a className="showcase-photo" href={emailLink(`${project.name} details`)}><img src={project.image} alt={project.name} /></a>
+            <article
+              className={`showcase-small slide-content-${showcaseDirection}`}
+              key={`${showcaseIndex}-${project.name}-${project.place}`}
+            >
+              <Link className="showcase-photo" to={`/properties/${project.slug}`}><img src={project.image} alt={project.name} /></Link>
               <h3>{project.name}</h3>
               <span>{project.place}</span>
             </article>
           ))}
 
           <div className="showcase-controls">
-            <button type="button" aria-label="Previous projects" onClick={showPrevious}><ArrowLeft size={14} /></button>
+            <button type="button" aria-label="Previous projects" onClick={() => moveShowcase("previous")}><ArrowLeft size={14} /></button>
             <span className="pagination-line"><i style={{ width: `${((showcaseIndex + 1) / showcaseProjects.length) * 100}%` }} /></span>
-            <button type="button" aria-label="Next projects" onClick={showNext}><ArrowRight size={14} /></button>
+            <button type="button" aria-label="Next projects" onClick={() => moveShowcase("next")}><ArrowRight size={14} /></button>
             <span className="sr-only" aria-live="polite">
               Showing {visibleProjects.map((project) => project.name).join(" and ")}
             </span>
           </div>
 
-          <a className="showcase-explore" href="#projects">Explore more projects <span>in our collection</span> <ArrowUpRight size={13} /></a>
+          <Link className="showcase-explore" to="/properties">Explore more projects <span>in our collection</span> <ArrowUpRight size={13} /></Link>
         </div>
       </div>
     </section>
@@ -315,26 +344,48 @@ function Retreat() {
     },
   ];
   const [activeSpotlight, setActiveSpotlight] = useState(0);
+  const [previousSpotlight, setPreviousSpotlight] = useState(null);
+  const [spotlightDirection, setSpotlightDirection] = useState("next");
   const spotlight = spotlights[activeSpotlight];
-  const showPrevious = () => setActiveSpotlight((current) => (current - 1 + spotlights.length) % spotlights.length);
-  const showNext = () => setActiveSpotlight((current) => (current + 1) % spotlights.length);
+  const moveSpotlight = (direction) => {
+    setPreviousSpotlight(activeSpotlight);
+    setSpotlightDirection(direction);
+    setActiveSpotlight((current) => (
+      direction === "next"
+        ? (current + 1) % spotlights.length
+        : (current - 1 + spotlights.length) % spotlights.length
+    ));
+  };
 
   return (
-    <section className="retreat" style={{ backgroundImage: `url("${spotlight.image}")` }}>
+    <section
+      className="retreat"
+      style={{ backgroundImage: `url("${spotlights[previousSpotlight ?? activeSpotlight].image}")` }}
+    >
+      {previousSpotlight !== null && (
+        <div
+          className={`retreat-background slide-background-${spotlightDirection}`}
+          key={activeSpotlight}
+          style={{ backgroundImage: `url("${spotlight.image}")` }}
+          aria-hidden="true"
+        />
+      )}
       <div className="retreat-shade" />
       <div className="retreat-content">
-        <span className="pill pill-light">Property spotlight</span>
-        <span className="retreat-location"><Sparkles size={12} /> {spotlight.location}</span>
-        <h2>{spotlight.title[0]}<br />{spotlight.title[1]}</h2>
-        <p>{spotlight.description}</p>
-        <a href="#projects" className="button button-white">Find property <ChevronRight size={14} /></a>
+        <div className={`slide-content-${spotlightDirection}`} key={`spotlight-copy-${activeSpotlight}`}>
+          <span className="pill pill-light">Property spotlight</span>
+          <span className="retreat-location"><Sparkles size={12} /> {spotlight.location}</span>
+          <h2>{spotlight.title[0]}<br />{spotlight.title[1]}</h2>
+          <p>{spotlight.description}</p>
+          <Link to="/properties" className="button button-white">Find property <ChevronRight size={14} /></Link>
+        </div>
       </div>
       <div className="retreat-controls">
-        <button type="button" aria-label="Previous property spotlight" onClick={showPrevious}><ArrowLeft size={14} /></button>
+        <button type="button" aria-label="Previous property spotlight" onClick={() => moveSpotlight("previous")}><ArrowLeft size={14} /></button>
         <span className="sr-only" aria-live="polite">
           Property spotlight: {spotlight.location}, {spotlight.title.join(" ")}
         </span>
-        <button type="button" aria-label="Next property spotlight" onClick={showNext}><ArrowRight size={14} /></button>
+        <button type="button" aria-label="Next property spotlight" onClick={() => moveSpotlight("next")}><ArrowRight size={14} /></button>
       </div>
     </section>
   );
@@ -342,10 +393,20 @@ function Retreat() {
 
 function Testimonial() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [testimonialDirection, setTestimonialDirection] = useState("next");
   const quote = testimonials[activeTestimonial];
 
-  const showPrevious = () => setActiveTestimonial((current) => (current - 1 + testimonials.length) % testimonials.length);
-  const showNext = () => setActiveTestimonial((current) => (current + 1) % testimonials.length);
+  const moveTestimonial = (index, direction) => {
+    setTestimonialDirection(direction);
+    setActiveTestimonial(index);
+  };
+  const showPrevious = () => moveTestimonial((activeTestimonial - 1 + testimonials.length) % testimonials.length, "previous");
+  const showNext = () => moveTestimonial((activeTestimonial + 1) % testimonials.length, "next");
+  const chooseTestimonial = (index) => {
+    const nextDistance = (index - activeTestimonial + testimonials.length) % testimonials.length;
+    const previousDistance = (activeTestimonial - index + testimonials.length) % testimonials.length;
+    moveTestimonial(index, nextDistance <= previousDistance ? "next" : "previous");
+  };
 
   return (
     <section className="testimonial section-pad" id="testimonials">
@@ -358,17 +419,19 @@ function Testimonial() {
       </div>
 
       <div className="testimonial-content">
-        <div className="testimonial-image">
+        <div className={`testimonial-image slide-content-${testimonialDirection}`} key={`testimonial-image-${activeTestimonial}`}>
           <img src={quote.propertyImage} alt="Modern residence" />
           <span className="quote-mark"><Quote size={20} fill="currentColor" /></span>
         </div>
 
         <div className="quote-copy">
-          <p className="quote-text">“{quote.quote}”</p>
-          <p className="quote-text quote-second">{quote.second}</p>
+          <div className={`slide-content-${testimonialDirection}`} key={`testimonial-copy-${activeTestimonial}`}>
+            <p className="quote-text">“{quote.quote}”</p>
+            <p className="quote-text quote-second">{quote.second}</p>
+          </div>
 
           <div className="quote-bottom">
-            <div className="client">
+            <div className={`client slide-content-${testimonialDirection}`} key={`testimonial-client-${activeTestimonial}`}>
               <span className="client-initials" aria-hidden="true">
                 {quote.name.split(" ").map((part) => part[0]).join("")}
               </span>
@@ -385,7 +448,7 @@ function Testimonial() {
                     aria-label={`Show testimonial ${index + 1} from ${item.name}`}
                     aria-current={activeTestimonial === index ? "true" : undefined}
                     key={item.name}
-                    onClick={() => setActiveTestimonial(index)}
+                    onClick={() => chooseTestimonial(index)}
                   />
                 ))}
               </div>
@@ -423,53 +486,7 @@ function ContactSection() {
   );
 }
 
-function Footer() {
-  return (
-    <footer className="footer">
-      <div className="footer-main">
-        <div className="footer-brand">
-          <Brand light />
-          <p>Thoughtful places.<br />A better way to live.</p>
-          <a href="mailto:hello@brickline.com">hello@brickline.com <ArrowUpRight size={14} /></a>
-        </div>
-
-        <div className="footer-col">
-          <span>Explore</span>
-          <a href="#projects">Our properties</a>
-          <a href="#about">New developments</a>
-          <a href="#about">Our approach</a>
-        </div>
-
-        <div className="footer-col">
-          <span>Company</span>
-          <a href="#about">About Brickline</a>
-          <a href="#highlights">Our services</a>
-          <a href="#contact">Get in touch</a>
-        </div>
-
-        <a className="footer-note" href="#top">
-          <span>Find a place that<br />feels like yours.</span>
-          <MoveUpRight size={19} />
-        </a>
-      </div>
-
-      <div className="footer-bottom">
-        <span>© 2026 Brickline. All rights reserved.</span>
-        <div>
-          <a href="mailto:hello@brickline.com?subject=Website%20enquiry">Contact</a>
-          <span>Made for living well.</span>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 function HomePage() {
-  useEffect(() => {
-    const targetId = window.location.hash.slice(1);
-    if (targetId) document.getElementById(targetId)?.scrollIntoView();
-  }, []);
-
   return (
     <main>
       <Hero />
@@ -479,7 +496,7 @@ function HomePage() {
       <Retreat />
       <Testimonial />
       <ContactSection />
-      <Footer />
+      <SiteFooter />
     </main>
   );
 }
