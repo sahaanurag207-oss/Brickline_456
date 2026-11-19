@@ -37,18 +37,21 @@ To check a production build:
 npm run build
 npm run preview
 ```
-
-## Project structure
+## 📂 Project Structure
 
 ```text
-src/
-  data/siteData.js    Property, hero, showcase, and testimonial content
-  pages/HomePage.jsx  Landing page sections and interactive UI
-  App.jsx             Application entry component
-  index.css           Global styles and responsive layouts
-  main.jsx            React root and stylesheet entry
-index.html            HTML document and page metadata
-vite.config.js        Vite and React configuration
+Brickline_456/
+├── public/                 # Static assets
+├── src/
+│   ├── data/
+│   │   └── siteData.js     # Centralized hero, property, project, and testimonial content
+│   ├── pages/
+│   │   └── HomePage.jsx    # Main landing page sections and interactive carousels
+│   ├── App.jsx             # Root application component
+│   ├── index.css           # Global styles, variables, and responsive layout rules
+│   └── main.jsx            # React DOM entry point
+├── index.html              # HTML entry template and font imports
+├── package.json            # Dependencies and npm scripts
+├── vercel.json             # Vercel deployment configuration
+└── vite.config.js          # Vite bundler configuration
 ```
-
-Most page copy, project details, and remote image URLs are defined in `src/data/siteData.js`. Section layout and interactions are in `src/pages/HomePage.jsx`.
