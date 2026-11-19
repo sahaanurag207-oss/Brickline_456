@@ -496,7 +496,7 @@ function Testimonial() {
         </div>
 
         <div className="quote-copy">
-          <div className={`slide-content-${testimonialDirection}`} key={`testimonial-copy-${activeTestimonial}`}>
+          <div className={`quote-text-content slide-content-${testimonialDirection}`} key={`testimonial-copy-${activeTestimonial}`}>
             <p className="quote-text">“{quote.quote}”</p>
             <p className="quote-text quote-second">{quote.second}</p>
           </div>

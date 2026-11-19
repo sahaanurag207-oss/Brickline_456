@@ -460,11 +460,14 @@ h2, h3, p { margin-top: 0; }
   .testimonial { padding-top: 38px; padding-bottom: 43px; }
   .testimonial-heading { align-items: flex-start; flex-direction: column; gap: 13px; }
   .testimonial-heading h2 { font-size: 29px; }
-  .testimonial-content { grid-template-columns: 1fr; gap: 16px; }
+  .testimonial-content { grid-template-columns: 1fr; gap: 16px; align-items: start; }
   .testimonial-image > img { height: 190px; }
   .quote-text { font-size: 11px; }
-  .quote-bottom { display: flex; flex-wrap: wrap; }
-  .quote-controls, .quote-count { margin-left: auto; }
+  .quote-text-content { min-height: 85px; }
+  .quote-bottom { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 8px; }
+  .client { grid-column: 1 / -1; }
+  .quote-controls { grid-column: 1; margin: 0; }
+  .quote-count { grid-column: 2; justify-self: end; margin: 0; }
   .contact-section { align-items: flex-start; flex-direction: column; gap: 22px; }
   .contact-actions { flex-direction: row; align-items: center; flex-wrap: wrap; }
   .footer { padding: 36px 22px 18px; }
@@ -473,6 +476,14 @@ h2, h3, p { margin-top: 0; }
   .footer-note { font-size: 15px; }
   .footer-bottom { align-items: flex-start; flex-direction: column; }
   .footer-bottom > div { width: 100%; justify-content: space-between; gap: 8px; }
+}
+
+@media (max-width: 500px) {
+  .quote-text-content { min-height: 104px; }
+}
+
+@media (max-width: 350px) {
+  .quote-text-content { min-height: 141px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
